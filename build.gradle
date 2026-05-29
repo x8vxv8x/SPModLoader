@@ -31,7 +31,7 @@ version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    archivesName = propertyString('mod_id')
+    archivesName = propertyString('mod_name')
 }
 
 
@@ -179,7 +179,7 @@ if (!propertyBool('enable_shadow')) {
 }
 
 compileJava {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -192,22 +192,9 @@ jar {
     }
     doFirst {
         manifest {
-            def attribute_map = [:]
-            attribute_map['ModType'] = "CRL"
-            if (configurations.contain.size() > 0) {
-                attribute_map['ContainedDeps'] = configurations.contain.collect { it.name }.join(' ')
-                attribute_map['NonModDeps'] = true
-            }
-            if (propertyBool('is_coremod')) {
-                attribute_map['FMLCorePlugin'] = propertyString('coremod_plugin_class_name')
-                if (propertyBool('coremod_includes_mod')) {
-                    attribute_map['FMLCorePluginContainsFMLMod'] = true
-                }
-            }
-            if (propertyBool('use_access_transformer')) {
-                attribute_map['FMLAT'] = propertyString('access_transformer_locations')
-            }
-            attributes(attribute_map)
+            attributes 'Premain-Class': 'com.smd.submodloader.Agent'
+            attributes 'Can-Redefine-Classes': 'true'
+            attributes 'Can-Retransform-Classes': 'true'
         }
     }
     finalizedBy(tasks.named(remapTaskName).get())
@@ -230,7 +217,7 @@ tasks.named(remapTaskName).configure {
 }
 
 compileTestJava {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
 }
 
 test {
